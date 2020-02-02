@@ -5,6 +5,7 @@
 # Copyright (c) 2018 Viktor Villainov. Released under the MIT License.
 
 WG_CONFIG="/etc/wireguard/wg0.conf"
+WG_CLIENT_CONFIGS=$HOME/wg/clients
 
 function get_free_udp_port
 {
@@ -40,6 +41,10 @@ fi
 if [ "$( systemd-detect-virt )" == "openvz" ]; then
     echo "OpenVZ virtualization is not supported"
     exit
+fi
+
+if [ ! -d "$WG_CLIENT_CONFIGS" ]; then
+    mkdir -p $WG_CLIENT_CONFIGS
 fi
 
 if [ ! -f "$WG_CONFIG" ]; then
@@ -134,8 +139,8 @@ DNS = $CLIENT_DNS
 PublicKey = $SERVER_PUBKEY
 AllowedIPs = 0.0.0.0/0, ::/0
 Endpoint = $SERVER_HOST:$SERVER_PORT
-PersistentKeepalive = 25" > $HOME/$CLIENT_NAME-wg0.conf
-qrencode -t ansiutf8 -l L < $HOME/$CLIENT_NAME-wg0.conf
+PersistentKeepalive = 25" > $WG_CLIENT_CONFIGS/$CLIENT_NAME-wg0.conf
+qrencode -t ansiutf8 -l L < $WG_CLIENT_CONFIGS/$CLIENT_NAME-wg0.conf
 
     echo "net.ipv4.ip_forward=1" >> /etc/sysctl.conf
     echo "net.ipv4.conf.all.forwarding=1" >> /etc/sysctl.conf
@@ -163,7 +168,7 @@ qrencode -t ansiutf8 -l L < $HOME/$CLIENT_NAME-wg0.conf
     systemctl start wg-quick@wg0.service
 
     # TODO: unattended updates, apt install dnsmasq ntp
-    echo "Client config --> $HOME/$CLIENT_NAME-wg0.conf"
+    echo "Client config --> $WG_CLIENT_CONFIGS/$CLIENT_NAME-wg0.conf"
     echo "Now reboot the server and enjoy your fresh VPN installation! :^)"
 else
     ### Server is installed, add a new client
@@ -194,9 +199,9 @@ DNS = $CLIENT_DNS
 PublicKey = $SERVER_PUBKEY
 AllowedIPs = 0.0.0.0/0, ::/0 
 Endpoint = $SERVER_ENDPOINT
-PersistentKeepalive = 25" > $HOME/$CLIENT_NAME-wg0.conf
-qrencode -t ansiutf8 -l L < $HOME/$CLIENT_NAME-wg0.conf
+PersistentKeepalive = 25" > $WG_CLIENT_CONFIGS/$CLIENT_NAME-wg0.conf
+qrencode -t ansiutf8 -l L < $WG_CLIENT_CONFIGS/$CLIENT_NAME-wg0.conf
 
     ip address | grep -q wg0 && wg set wg0 peer "$CLIENT_PUBKEY" allowed-ips "$CLIENT_ADDRESS/32"
-    echo "Client added, new configuration file --> $HOME/$CLIENT_NAME-wg0.conf"
+    echo "Client added, new configuration file --> $WG_CLIENT_CONFIGS/$CLIENT_NAME-wg0.conf"
 fi
