@@ -9,7 +9,7 @@ This script will let you setup your own VPN server in no more than a minute, eve
 Run the script and follow the assistant:
 
 ```
-wget https://raw.githubusercontent.com/l-n-s/wireguard-install/master/wireguard-install.sh -O wireguard-install.sh
+wget https://raw.githubusercontent.com/NT-VPS/wireguard-install/master/wireguard-install.sh -O wireguard-install.sh
 bash wireguard-install.sh
 ```
 
@@ -34,7 +34,7 @@ Install WireGuard and reboot your computer:
     sudo add-apt-repository ppa:wireguard/wireguard -y && sudo apt update && sudo apt install wireguard resolvconf -y
     sudo reboot
 
-Copy the file `/root/client-wg0.conf` from a remote server to your local PC path `/etc/wireguard/wg0.conf` and run 
+Copy the file `/root/wg/clients/client-wg0.conf` from a remote server to your local PC path `/etc/wireguard/wg0.conf` and run 
 `sudo systemctl start wg-quick@wg0.service`
 
 To show VPN status, run `sudo wg show`.
